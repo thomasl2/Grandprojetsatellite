@@ -106,7 +106,7 @@ if len(nomfichier)<1:
     calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s)
 else:
     import csv
-    fichier=open(nomfichier,'r',newline='\r') # ouverture du fichier nomfichier en lecture
+    fichier=open(nomfichier,'r') # ouverture du fichier nomfichier en lecture
     lecteur=csv.DictReader(fichier)
     for l in lecteur:
         alt_o = float(l['alt_o'])
