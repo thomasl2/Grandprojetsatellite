@@ -1,6 +1,10 @@
 from math import *
 
 R_TERRE = 6371009
+#43°36'45.5"N 1°25'44.6"E
+phi_o=43.6126389
+theta_o= 1.429055555
+alt_o=50
 
 def spher_to_cart(r,theta,phi):
     """
@@ -43,8 +47,8 @@ def calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s):
     # cart_to_spher(coord_relat_sat['x'], coord_relat_sat['y'], coord_relat_sat['z'])
     coord_celestes = cart_to_spher(**coord_relat_sat)  # c'est un raccourci, ca disloque le contenu du dictionnaire
 
-    print ("les coordonnees celestes sont :", coord_celestes)  # c'est pas fini, afficher un beau resultat intermediaire
-    print("Lest coord celestes sont : Déclinaison:{} asdasd:{}".format(coord_celestes['theta'], coord_celestes['phi']))
+    #print ("les coordonnees celestes sont :", coord_celestes)  # c'est pas fini, afficher un beau resultat intermediaire
+    #print("Lest coord celestes sont : Déclinaison:{} asdasd:{}".format(coord_celestes['theta'], coord_celestes['phi']))
     '''
     def equations_celestes(lat_obs, phi, theta):
         phi = radians(phi)
@@ -84,11 +88,11 @@ def calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s):
             h = -h + pi
         if cos_z < 0:
             z += pi
-        return {'h': degrees(h), 'z': degrees(z)}
+        return {'hauteur': degrees(h), 'azimut': degrees(z)}
 
     azimut_et_hauteur = coord_horaires_vers_horizontales(phi_o, phi_s, coord_celestes['theta'] - theta_o)
 
-    print(azimut_et_hauteur)
+    #print(azimut_et_hauteur)
     return(azimut_et_hauteur)
 
 
@@ -99,24 +103,59 @@ if len(nomfichier)<1:
     alt_s=float(input("entrez la l'altitude du satellite "))
     theta_s=float(input("entrez la longitude du satellite "))
     phi_s=float(input("entrez la lattitude du satellite "))
-    alt_o=float(input("entrez la l'altitude de l'observateur "))
-    theta_o=float(input("entrez la longitude de l'observateur "))
-    phi_o=float(input("entrez la lattitude de l'observateur "))
+    #alt_o=float(input("entrez la l'altitude de l'observateur "))
+    #theta_o=float(input("entrez la longitude de l'observateur "))
+    #phi_o=float(input("entrez la lattitude de l'observateur "))
 
     calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s)
 else:
-    import csv
+    
     fichier=open(nomfichier,'r') # ouverture du fichier nomfichier en lecture
-    lecteur=csv.DictReader(fichier)
-    for l in lecteur:
-        alt_o = float(l['alt_o'])
-        theta_o = float(l['long_o'])
-        phi_o = float(l['lat_o'])
-        alt_s = float(l['alt_s'])
-        theta_s =float(l['long_s'])
-        phi_s = float(l['lat_s'])
+    ligne=fichier.readline()
+    listeligne=[]
+    
+    while ligne != '' :
+        sp=ligne.split('\t')
+        listeligne.append(sp)
+        ligne=fichier.readline()
+    fichier.close()
+    print(listeligne)
+    
+    listeaz=[]
+    listehaut=[]
+    for col in range (len(listeligne[0])):
+        #alt_o = float(l['alt_o'])
+        #theta_o = float(l['long_o'])
+        #phi_o = float(l['lat_o'])
+        alt_s = float(listeligne[2][col])
+        theta_s =float(listeligne[0][col])
+        phi_s= float(listeligne[1][col])
 
         coord_horiz=calcul(alt_o, theta_o, phi_o, alt_s, theta_s, phi_s)
+        listeaz.append(str(coord_horiz['azimut']))
+        listehaut.append(str(coord_horiz['hauteur']))
+        print(col,coord_horiz)
+    print('a',listeaz,'\n','h',listehaut)
+        
+
+    fichiersortie=open('azhaut.txt','w')
+    fichiersortie.write('\t'.join(listehaut)+'\n')
+    fichiersortie.write('\t'.join(listeaz)+'\n')
+    fichiersortie.close()
+    
+        
+        
+        
+    
+
+    '''
+        fichiersortie= open("azimuthauteur.csv",'w',newline='\n')
+        fieldnames= ['hauteur','azimut']
+        azwriter= csv.DictWriter(fichiersortie,fieldnames=fieldnames)
+        azwriter.writeheader()
+        azwriter.writerow(coord_horiz)
+        azwriter.writerow({'hauteur': 1, 'azimut': 2})
+    '''
 
 
     """
