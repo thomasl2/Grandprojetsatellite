@@ -69,7 +69,27 @@ def calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s):
             z=-z
         return {'h':degrees(h), 'z':degrees(z)}
         '''
+    def coord_h_vers_hor(y,z,x):
+        O = cos(radians(x)) #cosinus de l'angle horaire
+        U = sin(radians(x)) #sinus de l'angle horaire
+        H = cos(radians(z)) #cosinus de la déclinaison
+        W = sin(radians(z)) #sinus de la déclinaison
+        N = cos(radians(y)) #cosinus de la latitude de l'observateur
+        G = sin(radians(y)) #sinus de la latitude de l'observateur
 
+        t= N*O*H + W*G
+        
+        #print ("\n sin t = ",t,"\n")
+        a = asin (t)
+
+        #print (" la hauteur (t) en radians vaut : ",a)
+        h = degrees (a)
+        #print ("la hauteur en degré vaut",d,"\n")
+
+        AZIMUT = atan2(H*U, G*H*O-N*W)
+        z= degrees(AZIMUT)+180
+        
+        return {'hauteur': h, 'azimut': z}
     # phi=declinaison
     # theta=Angle horaire
     def coord_horaires_vers_horizontales(lat_obs, phi, theta):
@@ -77,6 +97,7 @@ def calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s):
         ref. https://www.wikiwand.com/fr/Syst%C3%A8me_de_coordonn%C3%A9es_c%C3%A9lestes#/Des_coordonn.C3.A9es_horaires_aux_coordonn.C3.A9es_horizontales
             Connaissant les valeurs respectives AH et δ de l'angle horaire et de la déclinaison, la hauteur h et l'azimut Z peuvent être obtenus grâce aux trois formules suivantes :
         """
+        
         phi = radians(phi)
         theta = radians(theta)
         lat_obs = radians(lat_obs)
@@ -90,8 +111,10 @@ def calcul(alt_o, theta_o, phi_o,alt_s, theta_s, phi_s):
             z += pi
         return {'hauteur': degrees(h), 'azimut': degrees(z)}
 
-    azimut_et_hauteur = coord_horaires_vers_horizontales(phi_o, phi_s, coord_celestes['theta'] - theta_o)
-
+    azimut_et_hauteur1 = coord_horaires_vers_horizontales(phi_o, phi_s, coord_celestes['theta'] - theta_o)
+    azimut_et_hauteur = coord_h_vers_hor(phi_o, phi_s, coord_celestes['theta'] - theta_o)
+    print('az1:',azimut_et_hauteur1)
+    print('az2:',azimut_et_hauteur)
     #print(azimut_et_hauteur)
     return(azimut_et_hauteur)
 
